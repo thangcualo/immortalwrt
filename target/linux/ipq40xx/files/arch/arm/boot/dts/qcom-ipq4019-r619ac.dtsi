@@ -7,7 +7,7 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	chosen {
+chosen {
 		bootargs-append = " ubi.mtd=ubi root=/dev/ubiblock0_1";
 	};
 
@@ -16,7 +16,7 @@
 		led-failsafe = &led_sys;
 		led-running = &led_sys;
 		led-upgrade = &led_sys;
-	};
+			};
 
 	soc {
 		rng@22000 {
@@ -27,6 +27,10 @@
 			status = "okay";
 			pinctrl-0 = <&mdio_pins>;
 			pinctrl-names = "default";
+		};
+
+		ess-psgmii@98000 {
+			status = "okay";
 		};
 
 		tcsr@1949000 {
@@ -68,10 +72,20 @@
 		watchdog@b017000 {
 			status = "okay";
 		};
+
+		ess-switch@c000000 {
+			status = "okay";
+		};
+
+		edma@c080000 {
+			status = "okay";
+		};
 	};
 
 	leds {
 		compatible = "gpio-leds";
+		pinctrl-0 = <&led_pins>;
+		pinctrl-names = "default";
 
 		led_sys: led-0 {
 			label = "blue:sys";
@@ -173,7 +187,7 @@
 				label = "ART";
 				reg = <0x170000 0x10000>;
 				read-only;
-				compatible = "nvmem-cells";
+compatible = "nvmem-cells";
 				#address-cells = <1>;
 				#size-cells = <1>;
 
@@ -187,9 +201,9 @@
 			};
 		};
 	};
-};
+			};
 
-&nand {
+			&nand {
 	status = "okay";
 
 	nand@0 {
@@ -216,11 +230,33 @@
 	status = "okay";
 };
 
+&nand {
+	status = "okay";
+
+	nand@0 {
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rootfs_part1: partition@0 {
+				label = "rootfs";
+				reg = <0x0 0x4000000>;
+			};
+
+			rootfs_part2: partition@4000000 {
+				label = "reserve";
+				reg = <0x4000000 0x4000000>;
+			};
+		};
+	};
+};
+
 &pcie0 {
 	status = "okay";
-	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_pins>;
-	perst-gpio = <&tlmm 4 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	perst-gpio = <&tlmm 4 GPIO_ACTIVE_HIGH>;
 	wake-gpio = <&tlmm 40 GPIO_ACTIVE_HIGH>;
 
 	/* Free slot for use */
@@ -248,8 +284,8 @@
 		mux {
 			pins = "gpio2";
 			function = "gpio";
-			output-low;
 			bias-pull-down;
+			output-low;
 		};
 	};
 
@@ -286,6 +322,29 @@
 			pins = "gpio16", "gpio17";
 			function = "blsp_uart0";
 			bias-disable;
+		};
+	};
+
+	led_pins: led_pinmux {
+		mux {
+			pins = "gpio32", "gpio39", "gpio50";
+			function = "gpio";
+			bias-pull-up;
+			output-low;
+		};
+
+		mux_1 {
+			pins = "gpio52";
+			function = "gpio";
+			bias-pull-up;
+			output-high;
+		};
+
+		mux_2 {
+			pins = "gpio61";
+			function = "gpio";
+			bias-pull-down;
+			output-high;
 		};
 	};
 };
