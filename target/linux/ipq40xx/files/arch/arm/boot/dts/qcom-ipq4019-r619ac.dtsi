@@ -6,13 +6,13 @@
 #include <dt-bindings/soc/qcom,tcsr.h>
 
 / {
-	aliases {
+		aliases {
 		led-boot = &led_sys;
 		led-failsafe = &led_sys;
 		led-running = &led_sys;
 		led-upgrade = &led_sys;
 		label-mac-device = &gmac0;
-	};
+		};
 
 	soc {
 		rng@22000 {
@@ -82,7 +82,7 @@
 		compatible = "gpio-leds";
 		pinctrl-0 = <&led_pins>;
 		pinctrl-names = "default";
-
+		
 		led_sys: sys {
 			label = "blue:sys";
 			gpios = <&tlmm 39 GPIO_ACTIVE_HIGH>;
@@ -132,12 +132,12 @@
 			partition@1 {
 				label = "Bootloader";
 				reg = <0x0 0x170000>;
-			};
+							};
 
 			partition@170000 {
 				label = "ART";
 				reg = <0x170000 0x10000>;
-			};
+				};
 
 			partition@180000 {
 				label = "unused";
@@ -183,7 +183,7 @@
 	status = "okay";
 	pinctrl-0 = <&pcie_pins>;
 	pinctrl-names = "default";
-	perst-gpio = <&tlmm 4 GPIO_ACTIVE_LOW>;
+	perst-gpio = <&tlmm 4 GPIO_ACTIVE_HIGH>;
 	wake-gpio = <&tlmm 40 GPIO_ACTIVE_HIGH>;
 
 	/* Free slot for use */
@@ -324,10 +324,10 @@
 
 &wifi0 {
 	status = "okay";
-	qcom,ath10k-calibration-variant = "R619AC";
+qcom,ath10k-calibration-variant = "R619AC";
 };
 
 &wifi1 {
 	status = "okay";
-	qcom,ath10k-calibration-variant = "R619AC";
+qcom,ath10k-calibration-variant = "R619AC";
 };
