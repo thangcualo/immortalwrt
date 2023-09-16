@@ -7,7 +7,7 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	chosen {
+chosen {
 		bootargs-append = " ubi.mtd=ubi root=/dev/ubiblock0_1";
 	};
 
@@ -27,6 +27,10 @@
 			status = "okay";
 			pinctrl-0 = <&mdio_pins>;
 			pinctrl-names = "default";
+		};
+
+		ess-psgmii@98000 {
+			status = "okay";
 		};
 
 		tcsr@1949000 {
@@ -68,15 +72,25 @@
 		watchdog@b017000 {
 			status = "okay";
 		};
+
+		ess-switch@c000000 {
+			status = "okay";
+		};
+
+		edma@c080000 {
+			status = "okay";
+		};
 	};
 
 	leds {
 		compatible = "gpio-leds";
+		pinctrl-0 = <&led_pins>;
+		pinctrl-names = "default";
 
 		led_sys: led-0 {
 			label = "blue:sys";
 			gpios = <&tlmm 39 GPIO_ACTIVE_HIGH>;
-			color = <LED_COLOR_ID_BLUE>;
+color = <LED_COLOR_ID_BLUE>;
 			function = LED_FUNCTION_POWER;
 		};
 
@@ -169,11 +183,17 @@
 				read-only;
 			};
 
+			partition@1 {
+				label = "Bootloader";
+				reg = <0x0 0x170000>;
+				read-only;
+			};
+
 			partition@170000 {
 				label = "ART";
 				reg = <0x170000 0x10000>;
 				read-only;
-				compatible = "nvmem-cells";
+			compatible = "nvmem-cells";
 				#address-cells = <1>;
 				#size-cells = <1>;
 
@@ -216,19 +236,25 @@
 	status = "okay";
 };
 
-&pcie0 {
+&nand {
 	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&pcie_pins>;
-	perst-gpio = <&tlmm 4 GPIO_ACTIVE_LOW>;
-	wake-gpio = <&tlmm 40 GPIO_ACTIVE_HIGH>;
 
-	/* Free slot for use */
-	bridge@0,0 {
-		reg = <0x00000000 0 0 0 0>;
-		#address-cells = <3>;
-		#size-cells = <2>;
-		ranges;
+	nand@0 {
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rootfs_part1: partition@0 {
+				label = "rootfs";
+				reg = <0x0 0x4000000>;
+			};
+
+			rootfs_part2: partition@4000000 {
+				label = "unused1";
+				reg = <0x4000000 0x4000000>;
+			};
+		};
 	};
 };
 
@@ -244,15 +270,6 @@
 };
 
 &tlmm {
-	pcie_pins: pcie_pinmux {
-		mux {
-			pins = "gpio2";
-			function = "gpio";
-			output-low;
-			bias-pull-down;
-		};
-	};
-
 	mdio_pins: mdio_pinmux {
 		mux_1 {
 			pins = "gpio6";
@@ -319,8 +336,23 @@
 	qcom,single-led-100;
 	qcom,single-led-10;
 };
+mux_1 {
+			pins = "gpio52";
+			function = "gpio";
+			bias-pull-up;
+			output-high;
+		};
 
-&gmac {
+		mux_2 {
+			pins = "gpio61";
+			function = "gpio";
+			bias-pull-down;
+			output-high;
+		};
+	};
+};
+
+		&gmac {
 	status = "okay";
 };
 
@@ -334,7 +366,7 @@
 	label = "lan4";
 };
 
-&swport2 {
+		&swport2 {
 	status = "okay";
 
 	label = "lan3";
@@ -351,7 +383,7 @@
 
 	label = "lan1";
 };
-
+	
 &swport5 {
 	status = "okay";
 };
