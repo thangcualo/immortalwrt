@@ -14,10 +14,6 @@
 		label-mac-device = &gmac0;
 	};
 
-	chosen {
-		bootargs-append = " root=/dev/ubiblock0_1 rootfstype=squashfs";
-	};
-
 	soc {
 		rng@22000 {
 			status = "okay";
@@ -133,58 +129,14 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			partition@0 {
-				label = "SBL1";
-				reg = <0x0 0x40000>;
-				read-only;
-			};
-
-			partition@40000 {
-				label = "MIBIB";
-				reg = <0x40000 0x20000>;
-				read-only;
-			};
-
-			partition@60000 {
-				label = "QSEE";
-				reg = <0x60000 0x60000>;
-				read-only;
-			};
-
-			partition@c0000 {
-				label = "CDT";
-				reg = <0xc0000 0x10000>;
-				read-only;
-			};
-
-			partition@d0000 {
-				label = "DDRPARAMS";
-				reg = <0xd0000 0x10000>;
-				read-only;
-			};
-
-			partition@e0000 {
-				label = "APPSBLENV";
-				reg = <0xe0000 0x10000>;
-				read-only;
-			};
-
-			partition@f0000 {
-				label = "APPSBL";
-				reg = <0xf0000 0x80000>;
-				read-only;
-			};
-
 			partition@1 {
 				label = "Bootloader";
 				reg = <0x0 0x170000>;
-				read-only;
 			};
 
 			partition@170000 {
 				label = "ART";
 				reg = <0x170000 0x10000>;
-				read-only;
 			};
 
 			partition@180000 {
@@ -220,7 +172,7 @@
 			};
 
 			rootfs_part2: partition@4000000 {
-				label = "reserve";
+				label = "unused1";
 				reg = <0x4000000 0x4000000>;
 			};
 		};
@@ -228,25 +180,19 @@
 };
 
 &pcie0 {
-        status = "okay";
+	status = "okay";
+	pinctrl-0 = <&pcie_pins>;
+	pinctrl-names = "default";
+	perst-gpio = <&tlmm 4 GPIO_ACTIVE_LOW>;
+	wake-gpio = <&tlmm 40 GPIO_ACTIVE_HIGH>;
 
-        perst-gpio = <&tlmm 4 GPIO_ACTIVE_LOW>;
-        wake-gpio = <&tlmm 40 GPIO_ACTIVE_HIGH>;
-
-       pinctrl-0 = <&pcie_pins>;
-       pinctrl-names = "default";
-
-        bridge@0,0 {
-                reg = <0x00000000 0 0 0 0>;
-                #address-cells = <3>;
-                #size-cells = <2>;
-                ranges;
-
-                wifi2: wifi@1,0 {
-                        compatible = "qcom,ath10k";
-                        reg = <0x00010000 0 0 0 0>;
-                };
-        };
+	/* Free slot for use */
+	bridge@0,0 {
+		reg = <0x00000000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+		ranges;
+	};
 };
 
 &qpic_bam {
